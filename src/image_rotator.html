@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Rotator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f0f0f0;
+        }
+        body.dark-mode {
+            background-color: #181818;
+            color: #181818;
+        }
+        body.dark-mode #canvas,
+        body.dark-mode .dark-mode-button.active {
+            visibility: visible;
+        }
+        body.dark-mode *:not(#canvas):not(.dark-mode-button.active) {
+            visibility: hidden;
+        }
+        .dark-mode-button {
+            position: fixed;
+            z-index: 10;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .dark-mode-button.top-left {
+            top: 10px;
+            left: 10px;
+        }
+        .dark-mode-button.top-right {
+            top: 10px;
+            right: 10px;
+        }
+        #canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        #canvas {
+            border: 1px solid #ccc;
+            background-color: white;
+        }
+        #controls {
+            margin-bottom: 20px;
+        }
+        button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-mode-button top-left" onclick="toggleDarkMode(this)">Dark Mode</button>
+    <button class="dark-mode-button top-right" onclick="toggleDarkMode(this)">Dark Mode</button>
+
+    <br><br> <!-- Paragraph jump between dark mode buttons and the rest -->
+
+    <h1>Upload an Image to Rotate</h1>
+    <div id="controls">
+        <input type="file" id="upload" accept="image/*" required>
+        <br><br>
+        <label for="angle">Rotation Angle (degrees): </label>
+        <input type="number" id="angle" value="90" required>
+        <br><br>
+        <label for="direction">Direction: </label>
+        <select id="direction">
+            <option value="clockwise">Clockwise</option>
+            <option value="counterclockwise">Counterclockwise</option>
+        </select>
+        <br><br>
+        <label for="interval">Rotation Interval (ms): </label>
+        <input type="number" id="interval" value="1000" required>
+        <br><br>
+        <button onclick="toggleRotateImage()">Start/Stop Rotation</button>
+        <button onclick="toggleFullScreen()">Full Screen</button>
+        <button onclick="showHelp()">Help</button>
+        <button onclick="scaleUp()">Scale Up</button>
+        <button onclick="scaleDown()">Scale Down</button>
+    </div>
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        let image = new Image();
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let rotateInterval;
+        let isRotating = false;
+        let scale = 1;
+
+        document.getElementById('upload').addEventListener('change', function(event) {
+            let file = event.target.files[0];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                image.onload = function() {
+                    scale = 1;
+                    drawImage();
+                }
+                image.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        function drawImage() {
+            canvas.width = image.width * scale;
+            canvas.height = image.height * scale;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        }
+
+        function rotateImage() {
+            let angle = parseInt(document.getElementById('angle').value);
+            let direction = document.getElementById('direction').value;
+
+            if (direction === 'counterclockwise') {
+                angle = -angle;
+            }
+
+            let radians = angle * Math.PI / 180;
+
+            let width = canvas.width;
+            let height = canvas.height;
+
+            let rotatedWidth = Math.abs(Math.cos(radians) * width) + Math.abs(Math.sin(radians) * height);
+            let rotatedHeight = Math.abs(Math.sin(radians) * width) + Math.abs(Math.cos(radians) * height);
+
+            let tempCanvas = document.createElement('canvas');
+            tempCanvas.width = rotatedWidth;
+            tempCanvas.height = rotatedHeight;
+            let tempCtx = tempCanvas.getContext('2d');
+
+            tempCtx.translate(rotatedWidth / 2, rotatedHeight / 2);
+            tempCtx.rotate(radians);
+            tempCtx.drawImage(canvas, -width / 2, -height / 2);
+
+            canvas.width = rotatedWidth;
+            canvas.height = rotatedHeight;
+            ctx.drawImage(tempCanvas, 0, 0);
+        }
+
+        function toggleRotateImage() {
+            if (isRotating) {
+                clearInterval(rotateInterval);
+                isRotating = false;
+            } else {
+                let interval = parseInt(document.getElementById('interval').value);
+                rotateInterval = setInterval(rotateImage, interval);
+                isRotating = true;
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function toggleDarkMode(button) {
+            document.body.classList.toggle('dark-mode');
+            let buttons = document.querySelectorAll('.dark-mode-button');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+        }
+
+        function showHelp() {
+            alert("Instructions:\n\n1. Upload an image.\n2. Set the rotation angle and direction.\n3. Set the rotation interval in milliseconds.\n4. Click 'Start/Stop Rotation' to start/stop rotation.\n5. Click 'Full Screen' for fullscreen mode.\n6. Click 'Dark Mode' to toggle dark mode.\n7. Use the mouse wheel with CTRL key or '+' and '-' keys to zoom in and out. Alternatively, use 'Scale Up' and 'Scale Down' buttons.");
+        }
+
+        canvas.addEventListener('wheel', function(event) {
+            if (event.ctrlKey) {
+                event.preventDefault();
+                if (event.deltaY < 0) {
+                    scale *= 1.1;
+                } else {
+                    scale *= 0.9;
+                }
+                drawImage();
+            }
+        });
+
+        window.addEventListener('keydown', function(event) {
+            if (event.key === '+') {
+                scale *= 1.1;
+                drawImage();
+            } else if (event.key === '-') {
+                scale *= 0.9;
+                drawImage();
+            }
+        });
+
+        function scaleUp() {
+            scale *= 1.1;
+            drawImage();
+        }
+
+        function scaleDown() {
+            scale *= 0.9;
+            drawImage();
+        }
+    </script>
+</body>
+</html>
+

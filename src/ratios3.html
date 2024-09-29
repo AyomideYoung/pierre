@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequency Ratio Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        label, input, button {
+            display: block;
+            margin: 20px auto;
+        }
+        .math-display {
+            margin-top: 30px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Frequency Ratio Player</h1>
+        <label for="base-frequency">Enter Base Frequency (Hz):</label>
+        <input type="number" id="base-frequency" value="432" min="1" step="any">
+
+        <label for="ratio">Enter Ratio (e.g. 1:2, 0.5, 3/4):</label>
+        <input type="text" id="ratio" placeholder="Enter ratio">
+
+        <button onclick="playFrequencies()">Play Frequencies</button>
+        <button onclick="stopFrequencies()">Stop Frequencies</button>
+
+        <div class="math-display" id="math-display"></div>
+    </div>
+
+    <script>
+        let audioContext;
+        let oscillatorLeft;
+        let oscillatorRight;
+
+        function parseRatio(ratio) {
+            if (ratio.includes(':')) {
+                const [num, den] = ratio.split(':').map(Number);
+                return {num, den, reciprocal: den / num};
+            } else if (ratio.includes('/')) {
+                const [num, den] = ratio.split('/').map(Number);
+                return {num, den, reciprocal: den / num};
+            } else {
+                const decimal = parseFloat(ratio);
+                return {num: 1, den: 1/decimal, reciprocal: 1/decimal};
+            }
+        }
+
+        function displayMath(baseFreq, ratioInput, newFreq, num, den) {
+            const mathDisplay = document.getElementById('math-display');
+            mathDisplay.innerHTML = `
+                <ul>
+                    <li><strong>Ratio Input:</strong></li>
+                    <li>1. Input: ${ratioInput}</li>
+                    <li>2. Convert: ${num}/${den}</li>
+                    <li>3. Reciprocal: ${den}/${num} = ${den / num}</li>
+                    <li>4. Multiply: ${baseFreq} Hz × ${den / num} = ${newFreq.toFixed(2)} Hz</li>
+                    <li>5. Proof: ${num}:${den} = ${baseFreq} Hz:${newFreq.toFixed(2)} Hz</li>
+                    <li><strong>Left:</strong> ${baseFreq} Hz, <strong>Right:</strong> ${newFreq.toFixed(2)} Hz</li>
+                </ul>
+            `;
+        }
+
+        function playFrequencies() {
+            const baseFreq = parseFloat(document.getElementById('base-frequency').value);
+            const ratioInput = document.getElementById('ratio').value;
+            const {num, den, reciprocal} = parseRatio(ratioInput);
+            const newFreq = baseFreq * reciprocal;
+
+            displayMath(baseFreq, ratioInput, newFreq, num, den);
+
+            if (audioContext) {
+                audioContext.close();
+            }
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            oscillatorLeft = audioContext.createOscillator();
+            oscillatorRight = audioContext.createOscillator();
+
+            const gainNodeLeft = audioContext.createGain();
+            const gainNodeRight = audioContext.createGain();
+
+            gainNodeLeft.gain.value = 0.5;
+            gainNodeRight.gain.value = 0.5;
+
+            oscillatorLeft.frequency.value = baseFreq;
+            oscillatorRight.frequency.value = newFreq;
+
+            const pannerLeft = audioContext.createStereoPanner();
+            const pannerRight = audioContext.createStereoPanner();
+            pannerLeft.pan.value = -1; // left ear
+            pannerRight.pan.value = 1; // right ear
+
+            oscillatorLeft.connect(gainNodeLeft).connect(pannerLeft).connect(audioContext.destination);
+            oscillatorRight.connect(gainNodeRight).connect(pannerRight).connect(audioContext.destination);
+
+            oscillatorLeft.start();
+            oscillatorRight.start();
+        }
+
+        function stopFrequencies() {
+            if (audioContext) {
+                oscillatorLeft.stop();
+                oscillatorRight.stop();
+                audioContext.close();
+            }
+        }
+    </script>
+</body>
+</html>
+
