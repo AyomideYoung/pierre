@@ -30,15 +30,15 @@
 }
 
 .base-btn {
-  @apply text-base w-full inline-block text-white p-1 rounded-md ring-1 ring-offset-2;
+  @apply inline-block text-white p-1 rounded-md ring-1 ring-offset-2;
 }
 
 .input-group label {
-  @apply text-base;
+  @apply text-base mb-1;
 }
 
 .input-group input {
-  @apply border-2 border-gray-300 text-sm rounded-lg hover:border-gray-700 focus:border-green-500 focus:outline-none;
+  @apply border-2 border-gray-300 text-sm rounded-lg hover:border-gray-700 focus:border-green-500 focus:outline-none p-1 px-2;
 }
 
 #result-table tr{
