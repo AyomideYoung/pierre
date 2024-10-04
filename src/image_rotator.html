@@ -4,13 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Image Rotator</title>
-    <link href="styles/build.css" rel="stylesheet"/>
+    <link href="styles/build.css" rel="stylesheet" />
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 40px;
-        background-color: #f0f0f0;
-      }
       body.dark-mode {
         background-color: #181818;
         color: #181818;
@@ -56,7 +51,7 @@
       }
     </style>
   </head>
-  <body>
+  <body class="font-cabin">
     <div class="h-[100vh] lg:flex lg:flex-row">
       <div
         id="side-banner"
@@ -67,15 +62,15 @@
         <br />
         <div class="text-white text-center mt-4">Our other tools</div>
         <nav class="p-4 justify-evenly gap-2 flex text-white text-sm flex-row">
-          <a href="image_rotator.html"
-            ><div class="bg-cyan-700 p-4">Image Rotator</div></a
+          <a href="ratios3.html"
+            ><div class="bg-cyan-700 p-4">Frequency Ratio Player</div></a
           >
           <a href="Riemann_Zeta_Function_Calculator.html"
             ><div class="bg-red-700 p-4">Reimann Zeta Function</div></a
           >
         </nav>
       </div>
-      <div id="content">
+      <div id="content" class="lg:w-2/3 container p-5">
         <!--<button
           class="dark-mode-button top-left"
           onclick="toggleDarkMode(this)"
@@ -92,27 +87,50 @@
         <br /><br />
         /*Paragraph jump between dark mode buttons and the rest */
     //-->
-        <h1>Upload an Image to Rotate</h1>
-        <div id="controls">
-          <input type="file" id="upload" accept="image/*" required />
-          <br /><br />
-          <label for="angle">Rotation Angle (degrees): </label>
-          <input type="number" id="angle" value="90" required />
-          <br /><br />
-          <label for="direction">Direction: </label>
-          <select id="direction">
-            <option value="clockwise">Clockwise</option>
-            <option value="counterclockwise">Counterclockwise</option>
-          </select>
-          <br /><br />
-          <label for="interval">Rotation Interval (ms): </label>
-          <input type="number" id="interval" value="1000" required />
-          <br /><br />
-          <button onclick="toggleRotateImage()">Start/Stop Rotation</button>
-          <button onclick="toggleFullScreen()">Full Screen</button>
-          <button onclick="showHelp()">Help</button>
-          <button onclick="scaleUp()">Scale Up</button>
-          <button onclick="scaleDown()">Scale Down</button>
+        <h1 class="font-title text-center text-2xl mb-4">
+          Upload an Image to Rotate
+        </h1>
+        <div id="controls" class="border p-3 border-gray-300">
+          <input
+            class="file:base-btn file:p-1 file:px-3 mb-2 file:text-white file:rounded-lg file:bg-green-700 file:border-none"
+            type="file"
+            id="upload"
+            accept="image/*"
+            required
+          />
+
+          <div class="input-group mb-1">
+            <label for="angle">Rotation Angle (degrees): </label>
+            <input type="number" id="angle" value="90" required />
+          </div>
+
+          <div class="input-group mb-1">
+            <label for="direction">Direction: </label>
+            <select id="direction">
+              <option value="clockwise">Clockwise</option>
+              <option value="counterclockwise">Counterclockwise</option>
+            </select>
+          </div>
+
+          <div class="input-group mb-1">
+            <label for="interval">Rotation Interval (ms): </label>
+            <input type="number" id="interval" value="1000" required />
+          </div>
+
+          <div class="flex flex-row justify-between">
+            <button
+              class="base-btn bg-blue-700 ring-blue-700"
+              onclick="toggleRotateImage()"
+            >
+              Start/Stop Rotation
+            </button>
+            <div class="text-white text-sm">
+              <button class="bg-blue-600 hover:bg-blue-700 rounded-lg p-2" onclick="toggleFullScreen()">Full Screen</button>
+              <button class="bg-purple-600 hover:bg-purple-700 rounded-lg p-2" onclick="showHelp()">Help</button>
+              <button class="bg-slate-700 hover:bg-slate-800 rounded-lg p-2" onclick="scaleUp()">Scale Up</button>
+              <button class="bg-slate-700 hover:bg-slate-800 rounded-lg p-2" onclick="scaleDown()">Scale Down</button>
+            </div>
+          </div>
         </div>
         <div id="canvas-container">
           <canvas id="canvas"></canvas>
