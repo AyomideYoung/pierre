@@ -41,4 +41,12 @@
   @apply border-2 border-gray-300 text-sm rounded-lg hover:border-gray-700 focus:border-green-500 focus:outline-none;
 }
 
+#result-table tr{
+    @apply first:font-title odd:bg-white even:bg-slate-200 text-sm
+}
+
+a {
+  @apply hover:underline
+}
+
 /* noto-sans-latin-wght-normal */

@@ -39,9 +39,19 @@
     </style>
   </head>
   <body class="font-cabin">
-    <div class="flex h-[100vh] o flex-row">
-      <div class="md:w-1/3 bg-gradient-to-b from-sky-500 to-lime-600"></div>
-      <div class="container p-4 md:w-2/3 overflow-scroll">
+    <div class="h-[100vh] lg:flex lg:flex-row">
+      <div id="side-banner" class="w-full lg:w-1/3 bg-gradient-to-b from-gray-800 to-gray-950 flex flex-col items-center
+       justify-center">
+        <img width="70" src="images/somelogo.svg" alt="Logo"/>
+        <h3 class="font-title text-xl text-gray-300 pt-3">Fish Monkey</h3>
+        <br/>
+        <div class="text-white text-center mt-4">Our other tools</div>
+        <nav class="p-4 justify-evenly gap-2 flex text-white text-sm flex-row">
+          <a href="image_rotator.html"><div class=" bg-cyan-700 p-4"> Image Rotator</div></a>
+          <a href="ratios3.html"><div class=" bg-red-700 p-4">Tune Frequency Thing</div></a>
+        </nav>
+      </div>
+      <div class="container p-4 w-full lg:w-2/3 overflow-y-auto">
         <h1 class="text-2xl text-center font-title py-3">
           Riemann Zeta Function Calculator
         </h1>
@@ -76,7 +86,7 @@
         <div class="button-group">
             <button onclick="copyTable()">Copy Table</button>
         </div> //-->
-        <div id="plot-container"></div>
+        <div id="plot-container" class="font-title text-gray-500 mt-4 text-lg text-center p-5 md:p-8 border-2 border-slate-400 border-dashed"> Your result will be shown here</div>
         <div id="table-container"></div>
       </div>
     </div>
@@ -123,6 +133,7 @@
       }
 
       function generateTable(data, s, multiplier) {
+        let copyTableBtnHtml = `<div class="button-group flex flex-row justify-end"><button class="bg-purple-800 rounded-lg text-white text-cabin text-sm p-2 px-4" onclick="copyTable()">Copy Table</button></div>`
         let tableHTML = '<table id="result-table">';
         tableHTML +=
           "<tr><th>n</th><th>Calculation</th><th>Term Result</th><th>Cumulative Sum</th></tr>";
@@ -135,7 +146,7 @@
           tableHTML += "</tr>";
         }
         tableHTML += "</table>";
-        return tableHTML;
+        return copyTableBtnHtml+tableHTML;
       }
 
       function plotData(data, s, multiplier, maxN) {
