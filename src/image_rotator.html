@@ -55,41 +55,66 @@
     </style>
   </head>
   <body>
-    <div id="content">
-      <button class="dark-mode-button top-left" onclick="toggleDarkMode(this)">
-        Dark Mode
-      </button>
-      <button class="dark-mode-button top-right" onclick="toggleDarkMode(this)">
-        Dark Mode
-      </button>
-
-      <br /><br />
-      <!-- Paragraph jump between dark mode buttons and the rest -->
-
-      <h1>Upload an Image to Rotate</h1>
-      <div id="controls">
-        <input type="file" id="upload" accept="image/*" required />
-        <br /><br />
-        <label for="angle">Rotation Angle (degrees): </label>
-        <input type="number" id="angle" value="90" required />
-        <br /><br />
-        <label for="direction">Direction: </label>
-        <select id="direction">
-          <option value="clockwise">Clockwise</option>
-          <option value="counterclockwise">Counterclockwise</option>
-        </select>
-        <br /><br />
-        <label for="interval">Rotation Interval (ms): </label>
-        <input type="number" id="interval" value="1000" required />
-        <br /><br />
-        <button onclick="toggleRotateImage()">Start/Stop Rotation</button>
-        <button onclick="toggleFullScreen()">Full Screen</button>
-        <button onclick="showHelp()">Help</button>
-        <button onclick="scaleUp()">Scale Up</button>
-        <button onclick="scaleDown()">Scale Down</button>
+    <div class="h-[100vh] lg:flex lg:flex-row">
+      <div
+        id="side-banner"
+        class="w-full lg:w-1/3 bg-gradient-to-b from-gray-800 to-gray-950 flex flex-col items-center justify-center"
+      >
+        <img width="70" src="images/somelogo.svg" alt="Logo" />
+        <h3 class="font-title text-xl text-gray-300 pt-3">Fish Monkey</h3>
+        <br />
+        <div class="text-white text-center mt-4">Our other tools</div>
+        <nav class="p-4 justify-evenly gap-2 flex text-white text-sm flex-row">
+          <a href="image_rotator.html"
+            ><div class="bg-cyan-700 p-4">Image Rotator</div></a
+          >
+          <a href="Riemann_Zeta_Function_Calculator.html"
+            ><div class="bg-red-700 p-4">Reimann Zeta Function</div></a
+          >
+        </nav>
       </div>
-      <div id="canvas-container">
-        <canvas id="canvas"></canvas>
+      <div id="content">
+        <button
+          class="dark-mode-button top-left"
+          onclick="toggleDarkMode(this)"
+        >
+          Dark Mode
+        </button>
+        <button
+          class="dark-mode-button top-right"
+          onclick="toggleDarkMode(this)"
+        >
+          Dark Mode
+        </button>
+
+        <br /><br />
+        <!-- Paragraph jump between dark mode buttons and the rest -->
+
+        <h1>Upload an Image to Rotate</h1>
+        <div id="controls">
+          <input type="file" id="upload" accept="image/*" required />
+          <br /><br />
+          <label for="angle">Rotation Angle (degrees): </label>
+          <input type="number" id="angle" value="90" required />
+          <br /><br />
+          <label for="direction">Direction: </label>
+          <select id="direction">
+            <option value="clockwise">Clockwise</option>
+            <option value="counterclockwise">Counterclockwise</option>
+          </select>
+          <br /><br />
+          <label for="interval">Rotation Interval (ms): </label>
+          <input type="number" id="interval" value="1000" required />
+          <br /><br />
+          <button onclick="toggleRotateImage()">Start/Stop Rotation</button>
+          <button onclick="toggleFullScreen()">Full Screen</button>
+          <button onclick="showHelp()">Help</button>
+          <button onclick="scaleUp()">Scale Up</button>
+          <button onclick="scaleDown()">Scale Down</button>
+        </div>
+        <div id="canvas-container">
+          <canvas id="canvas"></canvas>
+        </div>
       </div>
     </div>
 
