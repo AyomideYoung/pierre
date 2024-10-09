@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magic Square Generator</title>
+    <style>
+      /* Embedded styles.css */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin: 10px 0 5px;
+      }
+
+      input {
+        padding: 10px;
+        width: calc(100% - 22px);
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+      }
+
+      .result {
+        margin-top: 20px;
+        font-size: 1.2em;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="h-[100vh] lg:flex lg:flex-row">
+      <div
+        id="side-banner"
+        class="w-full lg:w-1/3 bg-gradient-to-b from-gray-800 to-gray-950 flex flex-col items-center justify-center"
+      >
+        <img width="70" src="images/somelogo.svg" alt="Logo" />
+        <h3 class="font-title text-xl text-gray-300 pt-3">Fish Monkey</h3>
+        <br />
+        <div class="text-white text-center mt-4">Our other tools</div>
+        <nav class="p-4 justify-evenly gap-2 flex text-white text-sm flex-row">
+          <a href="ratios3.html"
+            ><div class="bg-cyan-700 p-4">Frequency Ratio Player</div></a
+          >
+          <a href="Riemann_Zeta_Function_Calculator.html"
+            ><div class="bg-red-700 p-4">Reimann Zeta Function</div></a
+          >
+        </nav>
+      </div>
+      <div id="content" class="lg:w-2/3 container p-5">
+        <h1>Magic Square Generator</h1>
+        <form id="magicSquareForm">
+          <label for="order">Order (integer only):</label>
+          <input type="number" id="order" name="order" min="3" required />
+
+          <label for="magicConstant">Magic Constant (integer only):</label>
+          <input
+            type="number"
+            id="magicConstant"
+            name="magicConstant"
+            required
+          />
+
+          <button type="submit">Generate Magic Square</button>
+        </form>
+
+        <div id="magicSquareResult" class="result">
+          <!-- Magic square will be displayed here -->
+        </div>
+
+        <button id="breakdownButton">Detailed Breakdown</button>
+        <button id="copyButton">Copy Square</button>
+        <button id="helpButton">Help</button>
+      </div>
+    </div>
+
+    <div id="helpModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Help</h2>
+        <p>
+          This webapp allows you to generate a magic square of any order and any
+          magic constant.
+        </p>
+        <p>
+          Enter the desired order (n) and magic constant, then click "Generate
+          Magic Square".
+        </p>
+        <p>
+          You can view the detailed breakdown of the calculation process, copy
+          the resulting square, and get help from this interface.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Embedded script.js
+      document
+        .getElementById("magicSquareForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const n = parseInt(document.getElementById("order").value);
+          const NMC = parseInt(document.getElementById("magicConstant").value);
+
+          if (isNaN(n) || isNaN(NMC) || n < 3) {
+            alert("Please enter valid values for order and magic constant.");
+            return;
+          }
+
+          const magicSquare = generateMagicSquare(n, NMC);
+          displayMagicSquare(magicSquare);
+        });
+
+      document
+        .getElementById("breakdownButton")
+        .addEventListener("click", function () {
+          alert("Detailed breakdown of the process...");
+          // Implement the detailed breakdown here
+        });
+
+      document
+        .getElementById("copyButton")
+        .addEventListener("click", function () {
+          const result = document.getElementById("magicSquareResult").innerText;
+          navigator.clipboard.writeText(result).then(() => {
+            alert("Magic square copied to clipboard!");
+          });
+        });
+
+      document
+        .getElementById("helpButton")
+        .addEventListener("click", function () {
+          document.getElementById("helpModal").style.display = "block";
+        });
+
+      document.querySelector(".close").addEventListener("click", function () {
+        document.getElementById("helpModal").style.display = "none";
+      });
+
+      window.onclick = function (event) {
+        const modal = document.getElementById("helpModal");
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      function generateMagicSquare(n, NMC) {
+        // Calculate integer part and remainder
+        const MC = (n * (n * n + 1)) / 2;
+        const integerComponent = Math.floor((NMC - (n / 2) * (n * n - 1)) / n);
+        const remainder = (NMC - (n / 2) * (n * n - 1)) % n;
+        const IC = n * n - n * remainder + 1;
+
+        // Base magic square for different n
+        let baseMagicSquare;
+        if (n === 3) {
+          baseMagicSquare = [
+            [8, 1, 6],
+            [3, 5, 7],
+            [4, 9, 2],
+          ];
+        } else if (n === 4) {
+          baseMagicSquare = [
+            [16, 2, 3, 13],
+            [5, 11, 10, 8],
+            [9, 7, 6, 12],
+            [4, 14, 15, 1],
+          ];
+        } else {
+          alert("Currently, this app supports only 3x3 and 4x4 magic squares.");
+          return;
+        }
+
+        // Adjust the base magic square
+        const newMagicSquare = baseMagicSquare.map((row) =>
+          row.map((cell) => {
+            return cell >= IC
+              ? cell + integerComponent
+              : cell + integerComponent - 1;
+          })
+        );
+
+        return newMagicSquare;
+      }
+
+      function displayMagicSquare(magicSquare) {
+        const resultDiv = document.getElementById("magicSquareResult");
+        resultDiv.innerHTML = "";
+        magicSquare.forEach((row) => {
+          resultDiv.innerHTML += row.join(" ") + "\n";
+        });
+      }
+    </script>
+  </body>
+</html>
