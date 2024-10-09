@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/docs/styles/build.css" rel="stylesheet" />
     <title>Magic Square Generator</title>
     <style>
       /* Embedded styles.css */
@@ -13,14 +14,6 @@
         padding: 0;
       }
 
-      .container {
-        width: 80%;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: white;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
 
       form {
         margin-bottom: 20px;
@@ -87,57 +80,68 @@
       }
     </style>
   </head>
-  <body>
+  <body class="font-cabin">
     <div class="h-[100vh] lg:flex lg:flex-row">
       <div
         id="side-banner"
-        class="w-full lg:w-1/3 bg-gradient-to-b from-gray-800 to-gray-950 flex flex-col items-center justify-center"
+        class="w-full lg:w-1/3 p-2 py-3 bg-gradient-to-b from-gray-800 to-gray-950 flex flex-col items-center justify-center"
       >
         <img width="70" src="images/somelogo.svg" alt="Logo" />
         <h3 class="font-title text-xl text-gray-300 pt-3">Fish Monkey</h3>
         <br />
         <div class="text-white text-center mt-4">Our other tools</div>
-        <nav class="p-4 justify-evenly gap-2 flex text-white text-sm flex-row">
+        <nav class="p-4 justify-evenly gap-2 flex flex-wrap text-white text-sm flex-row">
           <a href="ratios3.html"
             ><div class="bg-cyan-700 p-4">Frequency Ratio Player</div></a
           >
           <a href="Riemann_Zeta_Function_Calculator.html"
             ><div class="bg-red-700 p-4">Reimann Zeta Function</div></a
           >
+          <a href="image_rotator.html"
+            ><div class="bg-indigo-800 p-4">Image Rotator</div></a
+          >
         </nav>
       </div>
-      <div id="content" class="lg:w-2/3 container p-5">
-        <h1>Magic Square Generator</h1>
+      <div id="content" class="md:w-2/3 lg:w-1/2 container p-5">
+        <h1 class="text-2xl text-center font-title">Magic Square Generator</h1>
         <form id="magicSquareForm">
-          <label for="order">Order (integer only):</label>
-          <input type="number" id="order" name="order" min="3" required />
-
-          <label for="magicConstant">Magic Constant (integer only):</label>
-          <input
-            type="number"
-            id="magicConstant"
-            name="magicConstant"
-            required
-          />
-
-          <button type="submit">Generate Magic Square</button>
+          <div class="input-group">
+            <label for="order">Order (integer only):</label>
+            <input type="number" id="order" name="order" min="3" required />
+          </div>
+          <div class="input-group">
+            <label for="magicConstant">Magic Constant (integer only):</label>
+            <input
+              type="number"
+              id="magicConstant"
+              name="magicConstant"
+              required
+            />
+          </div>
+          <br/>
+          <button
+            class="base-btn px-2 bg-green-600 hover:bg-green-500 ring-green-600 text-white"
+            type="submit"
+          >
+            Generate Magic Square
+          </button>
         </form>
 
         <div id="magicSquareResult" class="result">
           <!-- Magic square will be displayed here -->
         </div>
 
-        <button id="breakdownButton">Detailed Breakdown</button>
-        <button id="copyButton">Copy Square</button>
-        <button id="helpButton">Help</button>
+        <button id="breakdownButton" class="p-2 px-3 rounded-lg bg-sky-700 hover:bg-sky-800 text-white text-sm">Detailed Breakdown</button>
+        <button id="copyButton" class="p-2 px-3 rounded-lg bg-purple-700 hover:bg-purple-600 text-white text-sm">Copy Square</button>
+        <button id="helpButton" class="p-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm">Help</button>
       </div>
     </div>
 
     <div id="helpModal" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
-        <h2>Help</h2>
-        <p>
+        <h2 class="text-lg font-title">Help</h2>
+        <p class="pt-2">
           This webapp allows you to generate a magic square of any order and any
           magic constant.
         </p>
