@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTF-32 Hexadecimal Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        textarea {
+            padding: 10px;
+            font-size: 1em;
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px;
+            font-size: 1em;
+        }
+        .history {
+            max-width: 400px;
+            margin: 20px auto;
+            text-align: left;
+        }
+        .history-item {
+            background: #e0e0e0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-container, .console-box {
+            font-family: monospace;
+            background: #000;
+            color: #00FF00;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 100px;
+            width: 100%;
+        }
+        .table-container {
+            padding: 5px;
+        }
+        .utf32-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .utf32-table th, .utf32-table td {
+            padding: 8px;
+            border: 1px solid #333;
+            text-align: left;
+            color: #00FF00;
+        }
+        .modal, .overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        .modal.active, .overlay.active {
+            display: block;
+        }
+        .modal-close, .copy-button {
+            display: block;
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .modal-close:hover, .copy-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>UTF-32 Hexadecimal Generator</h1>
+    <p>Enter text to generate its UTF-32 hexadecimal representation:</p>
+    <textarea id="textInput" rows="4" placeholder="Enter your text here"></textarea>
+    <div class="button-container">
+        <button onclick="generateHex()">Generate</button>
+        <button onclick="showHelp()">Help</button>
+    </div>
+
+    <div class="history" id="history"></div>
+
+    <!-- Modal for Breakdown -->
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="breakdownModal">
+        <div id="modalContent"></div>
+        <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="overlay" id="helpOverlay"></div>
+    <div class="modal" id="helpModal">
+        <h2>Help</h2>
+        <p><strong>Interface Guide:</strong></p>
+        <p>1. Enter text in the input box, preserving line breaks and spaces as needed.<br>
+           2. Click "Generate" to display the UTF-32 breakdown and concatenated hexadecimal for your text.<br>
+           3. Each generated result appears in the history as a “figure” with a counter and two buttons:<br>
+              - "Breakdown" shows a detailed view of the text, UTF-32 table, and concatenated hex.<br>
+              - "Copy Hexadecimal" copies the hexadecimal representation to your clipboard.</p>
+        
+        <p><strong>Explanation of the Conversion Process:</strong></p>
+        <p>
+            - <strong>UTF-32 Encoding:</strong> UTF-32 is a character encoding that represents each character as a fixed-length 32-bit (4-byte) integer. Each character in your input text is converted into a 32-bit hexadecimal number, allowing for consistent encoding, including for newline and special characters.<br><br>
+            
+            - <strong>Hexadecimal Representation:</strong> The hexadecimal (base-16) system uses digits 0-9 and letters A-F. In this app, each character’s UTF-32 code is displayed in hexadecimal format, with each 32-bit number represented by 8 hex digits.<br><br>
+            
+            - <strong>UTF-32 Table:</strong> The table shows each character in your input along with its UTF-32 hexadecimal equivalent. Special characters, such as spaces and newlines, are labeled as `[space]` and `\\n` for easy identification.<br><br>
+            
+            - <strong>Concatenated Hexadecimal:</strong> After all characters are converted, the hexadecimal values are concatenated into a single string, representing the entire input as one continuous hexadecimal sequence.
+        </p>
+        <button class="modal-close" onclick="closeHelp()">Close</button>
+    </div>
+
+    <script>
+        let figureCounter = 1;
+        let history = [];
+
+        function generateHex() {
+            const input = document.getElementById('textInput').value;
+            if (!input) {
+                alert("Please enter some text!");
+                return;
+            }
+
+            const utf32Table = generateUtf32Table(input);
+            const concatenatedHex = concatenateHex(input);
+
+            // Store result in history
+            history.push({ figure: figureCounter, text: input, table: utf32Table, hex: concatenatedHex });
+
+            // Add new entry to the main interface
+            updateHistory();
+            figureCounter++;
+            document.getElementById('textInput').value = '';  // Clear the input
+        }
+
+        function generateUtf32Table(input) {
+            let tableHTML = `<table class="utf32-table"><tr><th>Character</th><th>UTF-32 Hex</th></tr>`;
+            for (let char of input) {
+                const utf32Hex = char.charCodeAt(0).toString(16).padStart(8, '0');
+                const displayChar = char === '\n' ? '\\n' : char === ' ' ? '[space]' : char; // Handle newlines and spaces in table display
+                tableHTML += `<tr><td>${displayChar}</td><td>${utf32Hex}</td></tr>`;
+            }
+            tableHTML += `</table>`;
+            return tableHTML;
+        }
+
+        function concatenateHex(input) {
+            return Array.from(input)
+                .map(char => char.charCodeAt(0).toString(16).padStart(8, '0'))
+                .join('');
+        }
+
+        function updateHistory() {
+            const historyElement = document.getElementById('history');
+            historyElement.innerHTML = history.map(entry => `
+                <div class="history-item">
+                    <strong>Figure ${entry.figure}</strong>
+                    <div>
+                        <button onclick="showBreakdown(${entry.figure - 1})">Breakdown</button>
+                        <button onclick="copyHex(${entry.figure - 1})">Copy Hexadecimal</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showBreakdown(index) {
+            const entry = history[index];
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <p><strong>Original Text:</strong></p>
+                <div class="console-box">${entry.text.replace(/\n/g, '<br>')}</div>
+                
+                <p><strong>UTF-32 Character Breakdown:</strong></p>
+                <div class="table-container">${entry.table}</div>
+                
+                <p><strong>Concatenated Hexadecimal:</strong></p>
+                <div class="console-box">${entry.hex}</div>
+            `;
+            document.getElementById('breakdownModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('breakdownModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function copyHex(index) {
+            const entry = history[index];
+            navigator.clipboard.writeText(entry.hex).then(() => {
+                alert('Hexadecimal number copied to clipboard!');
+            });
+        }
+
+        function showHelp() {
+            document.getElementById('helpModal').classList.add('active');
+            document.getElementById('helpOverlay').classList.add('active');
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').classList.remove('active');
+            document.getElementById('helpOverlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
+

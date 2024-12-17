@@ -29,6 +29,16 @@
   }
 }
 
+@layer utilities {
+  .small-caps {
+    font-variant: small-caps;
+  }
+
+  .no-variance {
+    font-variant: normal;
+  }
+}
+
 .base-btn {
   @apply inline-block text-white p-1 rounded-md ring-1 ring-offset-2;
 }
@@ -47,6 +57,10 @@
 
 a {
   @apply hover:underline
+}
+
+.link {
+  @apply text-purple-700 hover:text-purple-500
 }
 
 /* noto-sans-latin-wght-normal */
